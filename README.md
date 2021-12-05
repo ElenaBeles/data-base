@@ -307,6 +307,7 @@ id
 permission_id
 */
 
+____
 
 /*24.09*/
 
@@ -453,7 +454,8 @@ where "exeired Date" = 'now';
 
  продумать разрешение для собтственника документа
  */
-
+ 
+____
 
 /* дз */
 create table documents(
@@ -540,38 +542,10 @@ left join "roles" r
 where r."title" = 'admin';
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 insert into "documents" (id, title, owner_id)
 values ('2','name_cats','6')
 ON CONFLICT(id) DO UPDATE
 SET title = excluded.title;
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 select *
@@ -621,11 +595,7 @@ insert into "documents"(
 ,('timetable', '2021-10-10 00:07:53', '6')
 ;
 
-
-
-
-
-
+____
 
 
  /* 01.10.2021
