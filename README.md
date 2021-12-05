@@ -40,20 +40,23 @@ insert into "users"(
 
 
 --узнать количество записей
+```
 select count(*) from users;
-
+```
 --показать расположение файлов на жестком диске
+```
 show data_directory;
-
+```
 --удалить все записи с таблицы users(не очищает папку, тк Postgres хранит версии)
 --авто вакуум удаляет устаревшие данные, индексы
 --есть принудительный вакуум(как сборщик мусора в Java)
 
 --репликация - процесс объединения/соединения двух баз данных
-
-
-
+```
 delete from users;
+```
+
+
 
 --select запрос данных из таблицы
 --insert добавление пользователей в таблицы
@@ -63,7 +66,11 @@ delete from users;
 
 
 --синтаксис select: * - службное поле, которое говорит:"отобрази мне все поля"
+```
 --select *
+```
+
+
 
 select
 DISTINCT "name" -- уникальный
@@ -72,45 +79,50 @@ DISTINCT "name" -- уникальный
 , "amount" * 7 as mult --multiplication - умножение
 from users;
 
+
+```
 select 5*5 as mult;
 
 select 'K'*5 as check; -- так можно проверять
-
+```
 
 --существуют агригационные функции(например. сумма)
-
+```
 select sum("amount") from "users";
-
+```
+```
 select
 "name"
 , sum("amount")
 from "users"
 group by -- считает сумму для каждого имени
 "name"
-
+```
 --drop table "users"
 
 --удаление одной записи
---delete from users
---where id = 7
-
-
+```
+delete from users
+where id = 7
+```
+```
 create unique index on users (email);
-
+```
 
 
 
 ---------1)
-
+```
 create unique index on users (id, email);
 
 insert into "users" (id, name, password, email, created_at, updated_at, amount)
 values ('16','Lena', 'qwerty123', 'lenlen@mail.ru','2002-03-17 00:00:00', '2017-10-10 00:07:53','150')
 ON CONFLICT(email) DO UPDATE
 SET amount = excluded.amount;
-
+```
 
 ---------2)
+```
 create table messages(
 id serial primary key
 ,id_user_from INT
@@ -118,7 +130,7 @@ id serial primary key
 ,message varchar(255)
 ,send_at timestamp
 );
-
+```
 insert into "messages"(
 id_user_from
 ,id_user_to
@@ -129,7 +141,7 @@ id_user_from
 ,('13', '14', 'How are you?', '2021-09-17 18:06:00')
 ,('14', '13', 'i, Olyalya', '2021-09-17 18:06:01')
 ;
-
+```
 create table actions(
 id serial primary key
 ,id_user_from INT
@@ -137,8 +149,7 @@ id serial primary key
 ,action varchar(255)
 ,updated_at timestamp
 );
-
-
+```
 insert into "actions"(
 id_user_from
 ,id_user_to
@@ -150,7 +161,7 @@ id_user_from
 ,('13', '14', 'send message', '2021-09-17 18:06:00')
 ,('14', '13', 'send message', '2021-09-17 18:06:01')
 ;
-
+```
 --дз
 --1)запрос insert into users нужно преобразовать в паттерн insert или update
 --(смотреть будут именно sql-запрос), его нужно проверить
@@ -186,16 +197,10 @@ ____
 
 --Alias
 
-
-
-
-
-
-
 -- с помощью explain  можем посмотреть план запроса
 --scan проходит по строчкам таблицы
 
-
+```
 explain  select *
 from
      "users" u
@@ -205,9 +210,9 @@ left join
              u."id" = a."id_user_from"
              )
 where u."id" = 13 or u."id" = 14;           --логическое выражение(можно использовать и/или)
+```
 
-
-
+```
 /*left inclusive*/
 select *
 from
@@ -217,7 +222,8 @@ left join
          on (
              u."id" = a."id_user_from"
              );
-
+```
+```
 /*left exclusive*/
 select *
 from
@@ -228,6 +234,8 @@ left join
              u."id" = a."id_user_from"
              )
 where a."id" is NULL;
+```
+```
 /*full outer inclusive*/
 select *
 from
@@ -237,6 +245,8 @@ full outer join
          on (
              u."id" = a."id_user_from"
              );
+```
+```
 /*inner join*/
 select *
 from
@@ -246,7 +256,8 @@ inner join
          on (
              u."id" = a."id_user_from"
              );
-
+```
+```
 /*full outer exclusive*/
 select *
 from
@@ -256,6 +267,8 @@ full outer join
          on (
              u."id" = a."id_user_from"
              );
+ ```
+ ```
 /*right inclusive*/
 select *
 from
@@ -265,7 +278,8 @@ right join
          on (
              u."id" = a."id_user_from"
              );
-
+```
+```
 /*right exclusive*/
 select *
 from
@@ -276,13 +290,14 @@ right join
              u."id" = a."id_user_from"
              )
 where a."id" is NULL;
-
+```
 
 
 
 
 --выбрать все сообщения и соответствующие им индексы
 --так можно сделать связь многие ко многим
+```
 select*
 from
      "messages" m
@@ -292,7 +307,7 @@ left join
              m."id_user_from" = u."id"
              )
 where u."id" = 13 or u."id" = 14;
-
+```
 
 /*
 users:
@@ -314,7 +329,7 @@ permission_id
 ____
 
 /*24.09*/
-
+```
 create table roles(
 id serial primary key
 ,title varchar(30)
@@ -333,7 +348,8 @@ id serial primary key
 ,email varchar(255)
 );
 
-
+```
+```
 insert into "users"(
 --"id"
 "name"
@@ -346,8 +362,6 @@ insert into "users"(
 ('Lena', 'qwerty123', 'lenlen@mail.ru'),
 ('June', 'hey', 'june17@bk.ru')
 ;
-
-
 
 insert into "permissions"(
 "permission_level"
@@ -370,7 +384,8 @@ insert into "roles"(
 ,('admin')
 ,('reader')
 ;
-
+```
+```
 create table users_roles(
 id_user int
 ,id_role int
@@ -380,7 +395,8 @@ create table roles_permission(
 id_role int
 ,id_permission int
 );
-
+```
+```
 insert into "users_roles"(
 --"id"
 "id_user"
@@ -390,8 +406,6 @@ insert into "users_roles"(
 ('1', '3', 'now')
 , ('2', '1', 'NULL')
 ;
-
-
 
 insert into "roles_permission"(
 --"id"
@@ -412,13 +426,12 @@ insert into "roles_permission"(
 ('1', '4')
 , ('2', '2')
 ;
-
-
+```
 
 /*по id пользователя все действующие роли и разрешения*/
 
 
-
+```
 explain select *
 from
      "users" u
@@ -439,7 +452,7 @@ left join "permissions" p
           rp."id_permission" = p."id"
           )
 where "exeired Date" = 'now';
-
+```
 
 
 
@@ -462,6 +475,7 @@ where "exeired Date" = 'now';
 ____
 
 /* дз */
+```
 create table documents(
 id serial primary key
 ,title varchar(30)
@@ -493,11 +507,11 @@ create table documents_customer(
 id_customer varchar(30)
 , id_document varchar(30)
 );
+```
 
-*/
-
+```
 create unique index on documents (id);
-/*
+```
  доделать(без служебных таблиц, через служебные поля)
 
  плюс добавить select
@@ -510,8 +524,7 @@ create unique index on documents (id);
  уникальность - один к одному
  */
 
-
-
+```
 create table documents(
 id serial primary key
 ,title varchar(30)
@@ -528,10 +541,6 @@ left join "documents" d
         )
 where d."owner_id" = ?;
 
-
-
-
-
 select *
 from
      "users" u
@@ -544,14 +553,14 @@ left join "roles" r
              ur."id_role" = r."id"
         )
 where r."title" = 'admin';
-
-
+```
+```
 insert into "documents" (id, title, owner_id)
 values ('2','name_cats','6')
 ON CONFLICT(id) DO UPDATE
 SET title = excluded.title;
-
-
+```
+```
 select *
 from
      "users" u
@@ -574,6 +583,8 @@ insert into "users"(
 ,('Yellow', '321', 'yellow@mail.ru')
 ,('White', 'hello', 'hello@gmail.ru')
 ;
+```
+```
 insert into "roles"(
 "title"
 ) values
@@ -598,7 +609,7 @@ insert into "documents"(
 ('flowers', '2017-10-10 00:07:53', '6')
 ,('timetable', '2021-10-10 00:07:53', '6')
 ;
-
+```
 ____
 
 
@@ -619,6 +630,7 @@ pg_hba.conf Добавляет ещё один уровень доступа к 
 
 
 /* 08.10.2021*/
+```
 CREATE TABLE public.newtable (
   item varchar NULL,
   id serial NOT NULL,
@@ -626,7 +638,9 @@ CREATE TABLE public.newtable (
   cost_price float8 NULL,
   sell_price float8 NULL
 );
+```
 
+```
 INSERT INTO public.newtable
 (item, description, cost_price, sell_price)
 VALUES('Item1', 'Desc1', 16.03, 20.45);
@@ -661,7 +675,7 @@ VALUES('Item8', 'Desc8', 16.03, 20.45);
 INSERT INTO public.newtable
 (item, description, cost_price, sell_price)
 VALUES('Item9', 'Desc9', 16.03, 20.45);
-
+```
 
 /*
  select создает новую таблицу
@@ -719,27 +733,30 @@ CAST - приведение типов
 часто с помощью этой функции кастуют дату в timestamp и наоборот
 
 )
-*/
+```
 select
     item,
     CAST(sell_price * 100 as int) as price_in_kops
 from newtable;
-
+```
 
 /*агригационные функции:
   -они объединяют все строки в одну, вычисляя что-то
-  */
+```
 select
     sum(sell_price)
 from newtable
-
+```
 
 /*среднее значение*/
+```
 select
     avg(sell_price)
 from newtable;
+```
 
 /*тут аккуратнее надо быть, тк если поле Null то оно не посчитается*/
+```
 select
     count(sell_price)
 from newtable
@@ -747,49 +764,56 @@ from newtable
 select
     count(*)
 from newtable
+```
 
 /*перечисление
 
   array_agg - Объединение всех строк в одну(массив из данных поля которое в скобочках)
-  */
+*/
+```
 select
     count(*), sum(sell_price), array_agg(cost_price)
 from newtable;
 
-
+```
 
 /*сортировка по полям item, sell_price */
+```
 select
 *
 from  newtable n
 order by
 item, sell_price
-
+```
 
 /*
  asc - сортировка от меньшего к большему
  desc - сортировка от большего к меньшему
  */
+ 
+ ```
 select
 *
 from  newtable n
 order by
 item desc;
-
+```
 /*ограничили кол-во элементов в выводе - в примере 5 первых элементов*/
+```
 select
 *
 from  newtable n
 order by
 item desc
 limit 5;
-
+```
 
 /*
 limit
 offset (это сдвиг. В примере на сколько сдвиг - на 5 записей)
 для пагинации(сколько записей на странице)
 */
+```
 select
 *
 from  newtable n
@@ -797,10 +821,12 @@ order by
 item desc
 limit 5
 offset 5;
-
+```
 /*
  чтобы из страницы получить оффсет
  */
+ 
+ ```
 select
 *
 from  newtable n
@@ -808,7 +834,7 @@ order by
 item desc
 limit 5
 page * offset + 1;
-
+```
 
 /*
  если пишем лимит оффсет то обязательно пишем ордер бай(тк мы не знаем какая сортировка внутри приложения и нам нужно задать свою)
@@ -830,6 +856,7 @@ where <, <=, <, >=, =, <>
   когда %es и es% мы можем построить индекс(хорошие паттерны)
   когда e%s и %es% мы не можем построить индекс(плохие паттерны)
   */
+ ```
 select
 *
 from  newtable n
@@ -838,10 +865,11 @@ description like '%es%'
 order by item desc
 limit 20
 offset 0;
-
+```
 
 -- _ - один любой символ(тут тоже скорее всего не создатся индекс)
 
+```
 select
 *
 from  newtable n
@@ -851,8 +879,9 @@ description like '_e%'
 order by item desc
 limit 20
 offset 0;
-
+```
 --в коде если фильтры не добавляем то проблема:
+```
 select
 *
 from  newtable n
@@ -862,8 +891,9 @@ where
 order by item desc
 limit 20
 offset 0;
-
+```
 --решение
+```
 select
 *
 from  newtable n
@@ -873,9 +903,8 @@ where 1==1
 order by item desc
 limit 20
 offset 0;
-
-
-
+```
+```
 select
 *
 from  newtable n
@@ -884,10 +913,10 @@ description between 'A' and 'D' --выведет все значения тк о
 order by item desc
 limit 20
 offset 0;
-
+```
 --C between надо осторожнее. работает не так как > <  а обрезает до нужной длины
 
-
+```
 select
 *
 from  newtable n
@@ -896,11 +925,12 @@ description in ('Desc1', 'Desc3') -- вложенный цикл. (тут смо
 order by item desc
 limit 20
 offset 0;
-
+```
 
 -- если сделать одно из полей NULL, то результат неверный тк нужно писать не sell_price = NULL, а sell_price is NULL (или sell_price is not NULL)
 -- в постгрисе false != NULL:
 --можно для заполнения таблицу сделать обязательно и дефолтной
+```
 select
 *
 from  newtable n
@@ -909,3 +939,4 @@ sell_price = NULL
 order by item desc
 limit 20
 offset 0;
+```
