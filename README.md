@@ -1,6 +1,7 @@
 # data-base
  
 --10.09
+```
 create table users(
 id serial primary key
 ,name varchar(30)
@@ -10,11 +11,13 @@ id serial primary key
 ,updated_at timestamp
 ,amount decimal(8, 2) -- 10 в степени 8 и 2 знака после запятой
 );
+```
 
 -- комментирование через два тире
 
 
 -- Добавление данных
+```
 insert into "users"(
 --"id"
 "name"
@@ -29,6 +32,7 @@ insert into "users"(
 ('Lyaysan', 'qwerty007', 'lya@mail.ru', '2002-03-01 00:00:00', '2017-10-10 00:07:53', 86),
 ('Lena', 'qwerty123', 'lenlen@mail.ru', '2002-03-17 00:00:00', '2017-10-10 00:07:53', 77)
 ;
+```
 --insert атомарная операция
 --либо все данные записываем вместе кучкой, либо по одному в зависимости от бизнес-задачи
 --комлпексная вставка сильно быстрее
