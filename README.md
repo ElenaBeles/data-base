@@ -150,6 +150,7 @@ id serial primary key
 ,updated_at timestamp
 );
 ```
+```
 insert into "actions"(
 id_user_from
 ,id_user_to
