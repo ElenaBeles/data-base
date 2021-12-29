@@ -1,0 +1,35 @@
+CREATE TABLE work (
+    id int not null primary key,
+    chief_id int references work(id),
+    name varchar(1000)
+);
+
+INSERT INTO work
+(id, chief_id, name)
+VALUES
+(1, null, 'Blinni'),
+(2, 1, 'Teddie'),
+(3, 2, 'Nickie'),
+(4, 1, 'Briney'),
+(5, 2, 'Cherrita'),
+(6, 4, 'Nanete'),
+(7, 5, 'Leona'),
+(8, 6, 'Debee'),
+(9, 8, 'Anthia');
+
+
+WITH RECURSIVE r AS (
+   SELECT id, chief_id, name
+   FROM work
+   WHERE chief_id = 1
+
+
+   UNION
+
+   SELECT work.id, work.chief_id, work.name
+   FROM work
+      JOIN r
+          ON work.chief_id = r.id
+)
+
+SELECT * FROM r;
