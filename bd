@@ -1,0 +1,174 @@
+--таблицы со связями
+create table users(
+id serial primary key
+,first_name varchar(30)
+,last_name varchar(30)
+,role_id int
+,FOREIGN KEY (role_id)  REFERENCES roles (id)
+);
+
+create table roles(
+id serial primary key
+,description varchar(30)
+,title varchar(30)
+);
+
+create table orders(
+id serial primary key
+,composition varchar(125)
+,created_at timestamp
+,courier_id int
+,costumer_id int
+,cafe_id int
+,FOREIGN KEY (costumer_id)  REFERENCES users (id)
+,FOREIGN KEY (courier_id)  REFERENCES users (id)
+,FOREIGN KEY (cafe_id)  REFERENCES cafes (id)
+);
+
+create table cafes(
+id serial primary key
+,title varchar(30)
+,rating int
+);
+
+create table cafes_providers(
+id_cafe int
+,id_providers int
+,FOREIGN KEY (id_cafe) REFERENCES cafes (id)
+,FOREIGN KEY (id_providers) REFERENCES providers (id)
+);
+
+create table providers(
+id serial primary key
+,country varchar(300)
+);
+
+
+--индексы
+
+create index on cafes(rating);
+
+create index on providers(country);
+
+
+--запросы
+select DISTINCT c.title, p.country
+from orders  as o
+join cafes as c
+ on(
+     c.id = o.cafe_id
+     )
+join cafes_providers cp
+    on (
+        c.id = cp.id_cafe
+        )
+join providers p
+    on (
+        cp.id_providers = p.id
+        )
+where c.rating = 5;
+
+
+select *
+from users
+where last_name like 'Amasa';
+
+--комментарии
+comment on table "users" is 'таблица с данными всех пользователей системы';
+COMMENT ON COLUMN users.id IS 'Порядковый номер пользователя';
+COMMENT ON COLUMN users.first_name IS 'Имя пользователя';
+COMMENT ON COLUMN users.last_name IS 'Фамилия пользователя';
+COMMENT ON COLUMN users.role_id IS 'Поле для связи с таблицей roles';
+
+
+comment on table "roles" is 'таблица с распределением прав/ролей в системе';
+COMMENT ON COLUMN roles.id IS 'Порядковый номер роли/права';
+COMMENT ON COLUMN roles.description IS 'Описание обязанностей для роли';
+COMMENT ON COLUMN roles.title IS 'Название роли';
+
+comment on table "orders" is 'таблица с данными всех заказов';
+COMMENT ON COLUMN orders.id IS 'Порядковый номер заказа';
+COMMENT ON COLUMN orders.composition IS 'Состав заказа';
+COMMENT ON COLUMN orders.courier_id IS 'Поле для связи с таблицей roles';
+COMMENT ON COLUMN orders.costumer_id IS 'Поле для связи с таблицей roles';
+COMMENT ON COLUMN orders.cafe_id IS 'Поле для связи с таблицей cafes';
+
+comment on table "cafes" is 'таблица с данными кафе-поставщиков для курьеров';
+COMMENT ON COLUMN cafes.id IS 'Порядковый номер кафе';
+COMMENT ON COLUMN cafes.title IS 'Название кафе';
+COMMENT ON COLUMN cafes.rating IS 'Рейтинг кафе. Для этого поля создан индекс для ускорения поиска нужного кафе в системе';
+
+comment on table "cafes_providers" is 'таблица для связи многие-ко-многим для таблиц cafes и providers';
+COMMENT ON COLUMN cafes_providers.id_cafe IS 'Поле для связи с таблицей cafes';
+COMMENT ON COLUMN cafes_providers.id_providers IS 'Поле для связи с таблицей providers';
+
+comment on table "providers" is 'таблица поставщиков продуктов для кафе';
+COMMENT ON COLUMN providers.id IS 'Порядковый номер поставщика';
+COMMENT ON COLUMN providers.country IS 'Страна поставщика';
+
+
+
+--данные
+insert into roles(
+                  description, title
+)values
+('доставка продукта от кафе до дома','доставщик 1'),
+('доставка продукта от поставщика до кафе','доставщик 2'),
+('создает заказы в приложении','заказчик');
+
+
+copy users(id, first_name, last_name, role_id) from 'C:\random_data\info_users.csv' delimiter ',';
+copy users(id, first_name, last_name, role_id) from 'C:\random_data\info_users2.csv' delimiter ',';
+copy users(id, first_name, last_name, role_id) from 'C:\random_data\info_users3.csv' delimiter ',';
+
+copy cafes(id, rating, title) from 'C:\random_data\info_cafes.csv' delimiter ',';
+copy orders(id, composition, courier_id, costumer_id, cafe_id)  from 'C:\random_data\info_orders.csv' delimiter ',';
+copy providers(id, country) from 'C:\random_data\info_providers.csv' delimiter ';';
+
+copy cafes_providers(id_cafe, id_providers) from 'C:\random_data\info_cafes_providers.csv' delimiter ';';
+
+
+
+
+--вью/материал вью
+
+CREATE VIEW names AS
+    SELECT distinct users.first_name
+    FROM users;
+
+CREATE VIEW common_orders AS
+    SELECT distinct orders.composition
+    FROM orders;
+
+
+CREATE MATERIALIZED VIEW list_of_countries AS
+    SELECT distinct providers.country
+    from providers;
+
+CREATE MATERIALIZED VIEW count_orders_from_Blinni AS
+    SELECT count(o.id)
+    from orders as o left join users u on u.id = o.costumer_id
+where u.first_name = 'Blinni';
+
+
+--create user, create role
+
+CREATE ROLE manager;
+GRANT ALL PRIVILEGES ON delivery.orders TO manager;
+
+
+create user admin_user with login password 'admin111';
+
+--триггеры
+
+CREATE FUNCTION emp_stamp() RETURNS trigger AS $emp_stamp$
+    BEGIN
+        -- Проверить, что указан состав заказа
+        IF NEW.composition IS NULL THEN
+            RAISE EXCEPTION 'composition cannot be null';
+        END IF;
+    END;
+$emp_stamp$ LANGUAGE plpgsql;
+
+CREATE TRIGGER emp_stamp BEFORE INSERT OR UPDATE ON orders
+    FOR EACH ROW EXECUTE PROCEDURE emp_stamp();
